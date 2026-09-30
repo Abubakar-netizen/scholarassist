@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScholarAssist — Secure Scholarship Assistance Management System</title>
+  <meta name="description" content="ScholarAssist is a secure web-based scholarship management platform empowering Pakistani students to discover opportunities, check rule-based eligibility, submit secure documents, and track applications with audit logging.">
+  
+  <!-- Google Fonts & FontAwesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <div class="logo" data-target-view="home-view" style="cursor: pointer;">
+        <div class="logo-icon"><i class="fa-solid fa-shield-halved"></i></div>
+        <div class="logo-text">Scholar<span>Assist</span></div>
+      </div>
+
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="#home" class="nav-link active" data-view="home-view"><i class="fa-solid fa-house"></i> Home</a></li>
+          <li><a href="#scholarships" class="nav-link" data-view="portal-view"><i class="fa-solid fa-graduation-cap"></i> Find Scholarships</a></li>
+          <li><a href="#login" class="nav-link" data-view="login-view"><i class="fa-solid fa-lock"></i> Portal Entry</a></li>
+          <li><a href="#audit" class="nav-link" data-view="audit-view"><i class="fa-solid fa-user-shield"></i> Security Audit</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <div class="role-pill" id="role-select-pill" title="Click to test role-based UI switching">
+          <span class="role-dot"></span>
+          <span id="active-role-name">Student / Applicant</span>
+          <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem;"></i>
+        </div>
+        <button class="btn btn-primary btn-sm" data-target-view="login-view">
+          <i class="fa-solid fa-right-to-bracket"></i> Login
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- ==========================================================================
+         PAGE 1: HOME / LANDING PAGE
+         ========================================================================== -->
+    <section id="home-view" class="view-section active">
+      <div class="hero">
+        <div>
+          <div class="hero-badge">
+            <i class="fa-solid fa-shield-cat"></i> Secure Software Development (SSD) Project
+          </div>
+          <h1 class="hero-title">Centralized, Secure <span>Scholarship Management</span> for Students</h1>
+          <p class="hero-desc">
+            ScholarAssist connects Pakistani students with higher education scholarships, featuring transparent rule-based eligibility evaluation, encrypted document submission, role-based access control, and complete audit logging.
+          </p>
+          <div class="hero-btns">
+            <button class="btn btn-primary" data-target-view="portal-view">
+              <i class="fa-solid fa-magnifying-glass-chart"></i> Discover Scholarships
+            </button>
+            <button class="btn btn-secondary" data-target-view="login-view">
+              <i class="fa-solid fa-user-shield"></i> Secure Portal Sign-In
+            </button>
+          </div>
+
+          <div class="hero-stats">
+            <div class="stat-item">
+              <h3>12,500+</h3>
+              <p>Applications Processed</p>
+            </div>
+            <div class="stat-item">
+              <h3>Rs. 450M+</h3>
+              <p>Grants Disbursed</p>
+            </div>
+            <div class="stat-item">
+              <h3>100%</h3>
+              <p>Audit Logged</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="glass-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+              <span class="security-badge-sm"><i class="fa-solid fa-lock"></i> AES-256 / RBAC Guarded</span>
+              <span style="font-size: 0.8rem; color: var(--text-dim);">Real-Time Security Feed</span>
+            </div>
+
+            <div style="background: rgba(15, 23, 42, 0.8); border-radius: var(--radius-md); padding: 1.25rem; border: 1px solid var(--border-glass);">
+              <div style="display: flex; align-items: center; gap: 0.85rem; margin-bottom: 1rem;">
+                <div style="width: 42px; height: 42px; background: rgba(6, 182, 212, 0.15); color: var(--secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                  <i class="fa-solid fa-user-check"></i>
+                </div>
+                <div>
+                  <h4 style="font-size: 0.95rem;">Rule-Based Eligibility Engine</h4>
+                  <p style="font-size: 0.8rem; color: var(--text-muted);">Transparent, deterministic criteria checks</p>
+                </div>
+              </div>
+
+              <div style="font-size: 0.85rem; background: rgba(31, 41, 55, 0.6); padding: 0.75rem; border-radius: var(--radius-sm); margin-bottom: 0.85rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                  <span style="color: var(--text-dim);">Minimum CGPA Required:</span>
+                  <span style="color: var(--text-main); font-weight: 600;">3.0 / 4.0</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: var(--text-dim);">Household Income Limit:</span>
+                  <span style="color: var(--text-main); font-weight: 600;">PKR 60,000 / mo</span>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 0.5rem;">
+                <span class="file-security-tag" style="background: rgba(16, 185, 129, 0.15); color: var(--success);"><i class="fa-solid fa-check"></i> Non-Repudiation Logs</span>
+                <span class="file-security-tag" style="background: rgba(59, 130, 246, 0.15); color: var(--info);"><i class="fa-solid fa-key"></i> Least Privilege</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comprehensive System Modules (12 Core Modules Showcase) -->
+      <div style="margin-top: 5rem;">
+        <div class="section-header">
+          <div class="section-tag">System Architecture</div>
+          <h2 class="section-title">Designed with Secure Software Principles</h2>
+          <p>ScholarAssist incorporates 12 integrated security & operational modules structured specifically for our Secure Security Design semester evaluation.</p>
+        </div>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon"><i class="fa-solid fa-fingerprint"></i></div>
+            <h3 class="feature-title">1. Authentication & Accounts</h3>
+            <p class="feature-desc">Secure account management with password hashing (bcrypt/Argon2), MFA readiness, rate-limiting, and session validation.</p>
+            <span class="security-badge-sm">Authentication Property</span>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon"><i class="fa-solid fa-sliders"></i></div>
+            <h3 class="feature-title">2. Profile & Rule Engine</h3>
+            <p class="feature-desc">Rule-based deterministic engine evaluating student CGPA, income thresholds, and domicile without opaque decisions.</p>
+            <span class="security-badge-sm">Transparency & Integrity</span>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon"><i class="fa-solid fa-list-check"></i></div>
+            <h3 class="feature-title">3. Scholarship Management</h3>
+            <p class="feature-desc">Allows scholarship officers to publish opportunities, establish eligibility thresholds, and manage deadlines securely.</p>
+            <span class="security-badge-sm">Role-Based Access Control</span>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon"><i class="fa-solid fa-shield-virus"></i></div>
+            <h3 class="feature-title">6. Secure Document Upload</h3>
+            <p class="feature-desc">Strict file-extension sandbox preventing malicious execution. Enforces extension whitelisting (.pdf, .jpg) & size caps.</p>
+            <span class="security-badge-sm">Malware & File Defense</span>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon"><i class="fa-solid fa-file-signature"></i></div>
+            <h3 class="feature-title">10. Audit & Event Logging</h3>
+            <p class="feature-desc">Comprehensive append-only security logging recording authentication events, document access, role switches, and decisions.</p>
+            <span class="security-badge-sm">Accountability & Auditability</span>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon"><i class="fa-solid fa-user-shield"></i></div>
+            <h3 class="feature-title">12. Threat Modeling Matrix</h3>
+            <p class="feature-desc">STRIDE methodology safeguards guarding against Broken Access Control (IDOR), SQL Injection, and privilege escalation.</p>
+            <span class="security-badge-sm">STRIDE Threat Resilience</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         PAGE 2: AUTHENTICATION & USER ENTRY PAGE
+         ========================================================================== -->
+    <section id="login-view" class="view-section">
+      <div class="auth-wrapper">
+        <div class="glass-card">
+          <div style="text-align: center; margin-bottom: 1.75rem;">
+            <div class="logo-icon" style="margin: 0 auto 1rem; width: 48px; height: 48px; font-size: 1.5rem;">
+              <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h2>ScholarAssist Portal Sign-In</h2>
+            <p style="font-size: 0.875rem;">Enter your verified credentials to access your secure portal</p>
+          </div>
+
+          <div class="auth-tabs">
+            <div class="auth-tab active" id="tab-login-btn">Account Login</div>
+            <div class="auth-tab" id="tab-register-btn">Student Registration</div>
+          </div>
+
+          <!-- Login Form -->
+          <form id="login-form">
+            <div class="form-group">
+              <label class="form-label" for="login-role">Select User Portal Role</label>
+              <select class="form-input" id="login-role">
+                <option value="STUDENT">Student / Applicant</option>
+                <option value="OFFICER">Scholarship Review Officer</option>
+                <option value="UNIV_OFFICER">University Verification Officer</option>
+                <option value="ADMIN">System & Security Administrator</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="login-email">Email Address / Student ID</label>
+              <div class="form-input-wrap">
+                <input type="email" class="form-input" id="login-email" placeholder="student@university.edu.pk" required value="student@university.edu.pk">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="login-password">Password</label>
+              <div class="form-input-wrap">
+                <input type="password" class="form-input" id="login-password" placeholder="••••••••••••" required value="ScholarAssist#2026">
+                <button type="button" class="input-icon-btn" id="toggle-password-btn" title="Show/Hide Password">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; font-size: 0.85rem;">
+              <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+                <input type="checkbox" checked> Remember session
+              </label>
+              <a href="#reset" style="color: var(--secondary);">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+              <i class="fa-solid fa-right-to-bracket"></i> Secure Sign In
+            </button>
+          </form>
+
+          <!-- Register Form (Hidden by default) -->
+          <form id="register-form" style="display: none;">
+            <div class="form-group">
+              <label class="form-label" for="reg-name">Full Name (As per CNIC)</label>
+              <input type="text" class="form-input" id="reg-name" placeholder="Abubakar Awan" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="reg-cnic">CNIC / B-Form Number (Automatic Format)</label>
+              <input type="text" class="form-input" id="reg-cnic" placeholder="35202-1234567-1" maxlength="15" required>
+              <span style="font-size: 0.75rem; color: var(--text-dim);">Privacy Control: CNIC is encrypted & masked for non-authorized viewers.</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="reg-email">University Email</label>
+              <input type="email" class="form-input" id="reg-email" placeholder="student@university.edu.pk" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="reg-password">Create Strong Password</label>
+              <input type="password" class="form-input" id="reg-password" placeholder="Minimum 8 characters with symbol" required>
+              <div class="strength-meter">
+                <div class="strength-bar" id="strength-bar"></div>
+              </div>
+              <div class="strength-text" id="strength-text">Password Quality: Evaluated dynamically</div>
+            </div>
+
+            <button type="submit" class="btn btn-accent" style="width: 100%; margin-top: 1rem;">
+              <i class="fa-solid fa-user-plus"></i> Register Student Account
+            </button>
+          </form>
+
+          <!-- Security Awareness Callout -->
+          <div class="security-alert-box">
+            <i class="fa-solid fa-shield-cat"></i>
+            <div>
+              <strong>SSD Security Design Note:</strong> Passwords are never transmitted or saved in plaintext. Production implementation uses Argon2id key derivation with per-user salt and HTTPS transport layer security.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         PAGE 3: CORE FUNCTIONAL PAGE - SCHOLARSHIP PORTAL & APPLICATION SYSTEM
+         ========================================================================== -->
+    <section id="portal-view" class="view-section">
+      <!-- Role Simulation Context Banner -->
+      <div id="reviewer-role-banner" style="display: none; background: rgba(245, 158, 11, 0.15); border: 1px solid var(--warning); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.5rem; font-size: 0.9rem;">
+        <i class="fa-solid fa-clipboard-check" style="color: var(--warning);"></i> <strong>Reviewer Portal Active:</strong> Viewing submitted student applications and performing document authentication checks.
+      </div>
+
+      <div id="admin-role-banner" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid var(--danger); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.5rem; font-size: 0.9rem;">
+        <i class="fa-solid fa-user-gear" style="color: var(--danger);"></i> <strong>Security Administrator Active:</strong> Full system monitoring, STRIDE threat enforcement, and audit log analysis enabled.
+      </div>
+
+      <div class="portal-header">
+        <div>
+          <h2>Scholarship Search & Eligibility Engine</h2>
+          <p>Find available grants, evaluate your rule-based eligibility transparently, and upload verified credentials.</p>
+        </div>
+        <div style="display: flex; gap: 0.75rem;">
+          <button class="btn btn-secondary btn-sm" id="my-applications-tab" onclick="document.getElementById('my-apps-section').scrollIntoView({behavior:'smooth'})">
+            <i class="fa-solid fa-folder-closed"></i> My Applications
+          </button>
+        </div>
+      </div>
+
+      <!-- DYNAMIC RULE-BASED ELIGIBILITY ENGINE WIDGET -->
+      <div class="eligibility-widget">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <h3 style="font-size: 1.3rem; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fa-solid fa-calculator" style="color: var(--secondary);"></i> Interactive Rule-Based Eligibility Calculator
+          </h3>
+          <span style="font-size: 0.8rem; color: var(--text-dim);">Determines eligibility deterministically</span>
+        </div>
+
+        <div class="eligibility-grid">
+          <div>
+            <div class="form-group">
+              <label class="form-label" for="elig-cgpa">Current Cumulative GPA (CGPA)</label>
+              <input type="number" step="0.01" min="0" max="4.0" class="form-input" id="elig-cgpa" value="3.45">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="elig-income">Monthly Household Income (PKR)</label>
+              <input type="number" step="1000" min="0" class="form-input" id="elig-income" value="55000">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div class="form-group">
+                <label class="form-label" for="elig-province">Domicile Province</label>
+                <select class="form-input" id="elig-province">
+                  <option value="Punjab">Punjab</option>
+                  <option value="Sindh">Sindh</option>
+                  <option value="KPK">Khyber Pakhtunkhwa</option>
+                  <option value="Balochistan">Balochistan</option>
+                  <option value="AJK">Azad Jammu & Kashmir</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="elig-discipline">Field of Study</label>
+                <select class="form-input" id="elig-discipline">
+                  <option value="Computer Science">Computer Science & IT</option>
+                  <option value="Engineering">Engineering</option>
+                  <option value="Medicine">Medicine & Health</option>
+                  <option value="Business">Business Studies</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="eligibility-output">
+            <div id="elig-output-badge" class="status-badge-lg eligible">
+              <i class="fa-solid fa-circle-check"></i> ELIGIBLE FOR SCHOLARSHIPS
+            </div>
+            <p id="elig-output-desc" style="font-size: 0.9rem; margin-bottom: 1.25rem;">
+              Your academic records satisfy all deterministic system rules!
+            </p>
+            <div style="width: 100%; text-align: left;">
+              <h4 style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.5rem;">Matched Opportunities:</h4>
+              <div id="elig-matched-scholarships"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEARCH & FILTER BAR -->
+      <div class="search-filter-bar">
+        <div>
+          <label class="form-label" for="scholarship-search-input">Keyword Search</label>
+          <input type="text" class="form-input" id="scholarship-search-input" placeholder="Search HEC, Ehsaas, PEEF, Ignite...">
+        </div>
+
+        <div>
+          <label class="form-label" for="filter-field">Field of Study</label>
+          <select class="form-input" id="filter-field">
+            <option value="">All Disciplines</option>
+            <option value="Computer Science">Computer Science</option>
+            <option value="Engineering">Engineering</option>
+            <option value="Medicine">Medicine</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="form-label" for="filter-degree">Degree Level</label>
+          <select class="form-input" id="filter-degree">
+            <option value="">All Levels</option>
+            <option value="BS">Bachelor's (BS)</option>
+            <option value="MS">Master's (MS)</option>
+            <option value="PhD">Doctorate (PhD)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="form-label" for="filter-income">Income Limit Filter</label>
+          <input type="range" min="30000" max="200000" step="5000" value="200000" class="form-input" id="filter-income" style="padding: 0.2rem;">
+          <span style="font-size: 0.75rem; color: var(--text-dim);" id="filter-income-val">PKR 200,000 (Max)</span>
+        </div>
+      </div>
+
+      <!-- SCHOLARSHIP CARDS GRID -->
+      <div id="scholarship-cards-container" class="scholarship-grid"></div>
+
+      <!-- MY SUBMITTED APPLICATIONS SECTION -->
+      <div id="my-apps-section" style="margin-top: 4rem;">
+        <div class="section-header" style="text-align: left; margin-bottom: 1.5rem;">
+          <h2>My Submitted Applications Tracker</h2>
+          <p>Monitor real-time progress, document verification status, and cryptographic audit receipts.</p>
+        </div>
+        <div id="my-applications-list"></div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         PAGE 4: SECURITY AUDIT & THREAT MONITORING PAGE
+         ========================================================================== -->
+    <section id="audit-view" class="view-section">
+      <div class="section-header">
+        <div class="section-tag">SSD Accountability & Monitoring</div>
+        <h2 class="section-title">Security Audit Log & STRIDE Matrix</h2>
+        <p>Demonstrating non-repudiation, tamper-evident action tracking, and defensive threat controls implemented for the ScholarAssist platform.</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem;">
+        <!-- Live Append-Only Audit Stream -->
+        <div class="audit-stream-card">
+          <div class="audit-header">
+            <h3><i class="fa-solid fa-terminal" style="color: var(--secondary);"></i> Append-Only Audit Stream</h3>
+            <span class="file-security-tag"><i class="fa-solid fa-lock"></i> Immutable Log</span>
+          </div>
+          <div id="audit-logs-list" class="audit-logs-container"></div>
+        </div>
+
+        <!-- STRIDE Threat Matrix Card -->
+        <div class="glass-card">
+          <h3 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fa-solid fa-shield-virus" style="color: var(--warning);"></i> STRIDE Threat Model Safeguards
+          </h3>
+          <p style="font-size: 0.875rem; margin-bottom: 1.25rem;">
+            Mapping core SSD course security topics directly to our platform defenses:
+          </p>
+
+          <div style="display: flex; flex-direction: column; gap: 0.85rem; font-size: 0.85rem;">
+            <div style="background: rgba(15, 23, 42, 0.8); padding: 0.85rem; border-radius: var(--radius-sm); border-left: 3px solid var(--danger);">
+              <strong>Spoofing Identity:</strong> Enforced through session validation, password complexity policies, and salted Argon2 hashing.
+            </div>
+
+            <div style="background: rgba(15, 23, 42, 0.8); padding: 0.85rem; border-radius: var(--radius-sm); border-left: 3px solid var(--warning);">
+              <strong>Tampering with Data:</strong> Prevented using cryptographic checksums (SHA-256) on student application state & parameter sanitization.
+            </div>
+
+            <div style="background: rgba(15, 23, 42, 0.8); padding: 0.85rem; border-radius: var(--radius-sm); border-left: 3px solid var(--info);">
+              <strong>Repudiation:</strong> Guaranteed via append-only audit event streaming detailing timestamp, actor, IP address, and role context.
+            </div>
+
+            <div style="background: rgba(15, 23, 42, 0.8); padding: 0.85rem; border-radius: var(--radius-sm); border-left: 3px solid var(--secondary);">
+              <strong>Information Disclosure:</strong> Data minimization applied. CNIC numbers masked, uploaded documents restricted by strict RBAC middleware.
+            </div>
+
+            <div style="background: rgba(15, 23, 42, 0.8); padding: 0.85rem; border-radius: var(--radius-sm); border-left: 3px solid var(--success);">
+              <strong>Elevation of Privilege:</strong> Enforces Principle of Least Privilege across 4 distinct roles (Student, Officer, Univ Officer, Admin).
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==========================================================================
+       MODAL DIALOGS
+       ========================================================================== -->
+
+  <!-- Application Submission Modal -->
+  <div id="application-modal" class="modal-overlay">
+    <div class="modal-box">
+      <button class="modal-close-btn" onclick="closeModal('application-modal')">&times;</button>
+      <div style="margin-bottom: 1.5rem;">
+        <span class="scholarship-tag">Application Submission</span>
+        <h2 id="modal-scholarship-title" style="font-size: 1.5rem; margin-top: 0.4rem;">Scholarship Application</h2>
+        <p id="modal-scholarship-desc" style="font-size: 0.9rem;">Scholarship Assistance Program</p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Applicant Name</label>
+        <input type="text" class="form-input" value="Abubakar Awan" readonly style="background: rgba(255,255,255,0.05);">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">CNIC / B-Form Number (Masked)</label>
+        <input type="text" class="form-input" value="35202-*******-1" readonly style="background: rgba(255,255,255,0.05);">
+      </div>
+
+      <!-- File Upload Sandbox Section -->
+      <div class="form-group">
+        <label class="form-label">Attach Verified Required Documents</label>
+        <p style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.5rem;">
+          <i class="fa-solid fa-shield-cat"></i> SSD File Upload Sandbox: Allowed extensions: <strong>.PDF, .PNG, .JPG</strong>. Executable files (.exe, .sh, .php, .js) will trigger security alerts.
+        </p>
+
+        <div class="file-upload-zone" id="document-drop-zone">
+          <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+          <h4>Click to browse or drop document here</h4>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.35rem;">Maximum file size limit: 5 MB per document</p>
+          <input type="file" id="file-upload-input" style="display: none;" accept=".pdf,.png,.jpg,.jpeg">
+        </div>
+
+        <div id="uploaded-files-container" class="uploaded-files-list"></div>
+      </div>
+
+      <div style="margin-top: 1.75rem; display: flex; justify-content: flex-end; gap: 1rem;">
+        <button class="btn btn-secondary" onclick="closeModal('application-modal')">Cancel</button>
+        <button class="btn btn-primary" id="submit-application-btn">
+          <i class="fa-solid fa-paper-plane"></i> Submit Encrypted Application
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Role Selection Modal (Demo Switcher) -->
+  <div id="role-select-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 500px;">
+      <button class="modal-close-btn" onclick="closeModal('role-select-modal')">&times;</button>
+      <h3 style="margin-bottom: 0.5rem;"><i class="fa-solid fa-users-gear" style="color: var(--secondary);"></i> Select System Role Context</h3>
+      <p style="font-size: 0.875rem; margin-bottom: 1.5rem;">Test role-tailored user interfaces as evaluated in our Secure Security Design project proposal:</p>
+
+      <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+        <div style="padding: 1rem; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-glass); border-radius: var(--radius-md); cursor: pointer; transition: var(--transition);" onclick="selectRole('STUDENT')">
+          <div style="font-weight: 700; color: #06b6d4;"><i class="fa-solid fa-user-graduate"></i> Student / Applicant</div>
+          <p style="font-size: 0.8rem; margin-top: 0.25rem;">Create profile, discover scholarships, test eligibility rules, submit documents & track status.</p>
+        </div>
+
+        <div style="padding: 1rem; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-glass); border-radius: var(--radius-md); cursor: pointer; transition: var(--transition);" onclick="selectRole('OFFICER')">
+          <div style="font-weight: 700; color: #f59e0b;"><i class="fa-solid fa-clipboard-check"></i> Scholarship Review Officer</div>
+          <p style="font-size: 0.8rem; margin-top: 0.25rem;">Publish scholarships, define eligibility thresholds, review applications & verify document authenticity.</p>
+        </div>
+
+        <div style="padding: 1rem; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-glass); border-radius: var(--radius-md); cursor: pointer; transition: var(--transition);" onclick="selectRole('UNIV_OFFICER')">
+          <div style="font-weight: 700; color: #3b82f6;"><i class="fa-solid fa-building-columns"></i> University Verification Officer</div>
+          <p style="font-size: 0.8rem; margin-top: 0.25rem;">Verify student enrollment status, CGPA verification, and academic institution details.</p>
+        </div>
+
+        <div style="padding: 1rem; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-glass); border-radius: var(--radius-md); cursor: pointer; transition: var(--transition);" onclick="selectRole('ADMIN')">
+          <div style="font-weight: 700; color: #ef4444;"><i class="fa-solid fa-user-shield"></i> System & Security Administrator</div>
+          <p style="font-size: 0.8rem; margin-top: 0.25rem;">Manage users & roles, monitor STRIDE security events, investigate audit logs & system settings.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="logo" style="margin-bottom: 1rem;">
+            <div class="logo-icon"><i class="fa-solid fa-shield-halved"></i></div>
+            <div class="logo-text">Scholar<span>Assist</span></div>
+          </div>
+          <p style="font-size: 0.875rem; max-width: 350px;">
+            Scholarship Assistance Management System developed as a Secure Software Development (SSD) course project incorporating defense-in-depth principles.
+          </p>
+        </div>
+
+        <div>
+          <h4 style="font-size: 0.95rem; margin-bottom: 1rem;">Quick Navigation</h4>
+          <ul style="list-style: none; font-size: 0.875rem; display: flex; flex-direction: column; gap: 0.5rem;">
+            <li><a href="#home" data-target-view="home-view">Project Overview</a></li>
+            <li><a href="#portal" data-target-view="portal-view">Find Scholarships</a></li>
+            <li><a href="#login" data-target-view="login-view">Secure Login</a></li>
+            <li><a href="#audit" data-target-view="audit-view">Security Audit Stream</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 style="font-size: 0.95rem; margin-bottom: 1rem;">Security Topics</h4>
+          <ul style="list-style: none; font-size: 0.875rem; display: flex; flex-direction: column; gap: 0.5rem; color: var(--text-dim);">
+            <li>Least Privilege RBAC</li>
+            <li>Rule Eligibility Engine</li>
+            <li>Append-Only Audit Logs</li>
+            <li>File Extension Sandbox</li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 style="font-size: 0.95rem; margin-bottom: 1rem;">Course Details</h4>
+          <p style="font-size: 0.85rem; color: var(--text-dim);">
+            <strong>Course:</strong> Secure Security Design (SSD)<br>
+            <strong>Project:</strong> ScholarAssist<br>
+            <strong>Stack:</strong> HTML5 / Custom CSS3 / Vanilla JS
+          </p>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>© 2026 ScholarAssist System. Built for Secure Software Development (SSD) Course.</div>
+        <div>Designed with Security-Aware Development Principles</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Application JavaScript Modules -->
+  <script src="js/data.js"></script>
+  <script src="js/security.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
