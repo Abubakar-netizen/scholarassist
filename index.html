@@ -35,12 +35,14 @@
       </nav>
 
       <div class="nav-actions">
-        <div class="role-pill" id="role-select-pill" title="Click to test role-based UI switching">
+        <div class="role-pill" id="role-indicator" aria-live="polite">
           <span class="role-dot"></span>
-          <span id="active-role-name">Student / Applicant</span>
-          <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem;"></i>
+          <span id="active-role-name">Guest</span>
         </div>
-        <button class="btn btn-primary btn-sm" data-target-view="login-view">
+        <button class="btn btn-secondary btn-sm" id="logout-btn" type="button" hidden>
+          <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </button>
+        <button class="btn btn-primary btn-sm" data-target-view="login-view" id="login-nav-btn">
           <i class="fa-solid fa-right-to-bracket"></i> Login
         </button>
       </div>
@@ -60,7 +62,7 @@
           </div>
           <h1 class="hero-title">Centralized, Secure <span>Scholarship Management</span> for Students</h1>
           <p class="hero-desc">
-            ScholarAssist connects Pakistani students with higher education scholarships, featuring transparent rule-based eligibility evaluation, encrypted document submission, role-based access control, and complete audit logging.
+            ScholarAssist connects Pakistani students with higher education scholarships, featuring transparent eligibility checks, demo role-specific dashboards, application review, and in-memory audit logging.
           </p>
           <div class="hero-btns">
             <button class="btn btn-primary" data-target-view="portal-view">
@@ -90,7 +92,7 @@
         <div class="hero-visual">
           <div class="glass-card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
-              <span class="security-badge-sm"><i class="fa-solid fa-lock"></i> AES-256 / RBAC Guarded</span>
+              <span class="security-badge-sm"><i class="fa-solid fa-user-lock"></i> Activity 2 Role Demo</span>
               <span style="font-size: 0.8rem; color: var(--text-dim);">Real-Time Security Feed</span>
             </div>
 
@@ -137,7 +139,7 @@
           <div class="feature-card">
             <div class="feature-icon"><i class="fa-solid fa-fingerprint"></i></div>
             <h3 class="feature-title">1. Authentication & Accounts</h3>
-            <p class="feature-desc">Secure account management with password hashing (bcrypt/Argon2), MFA readiness, rate-limiting, and session validation.</p>
+            <p class="feature-desc">Demo credentials map a student and a review officer to separate role-specific dashboards.</p>
             <span class="security-badge-sm">Authentication Property</span>
           </div>
 
@@ -151,7 +153,7 @@
           <div class="feature-card">
             <div class="feature-icon"><i class="fa-solid fa-list-check"></i></div>
             <h3 class="feature-title">3. Scholarship Management</h3>
-            <p class="feature-desc">Allows scholarship officers to publish opportunities, establish eligibility thresholds, and manage deadlines securely.</p>
+            <p class="feature-desc">Allows review officers to inspect submitted applications and update their status in the demo queue.</p>
             <span class="security-badge-sm">Role-Based Access Control</span>
           </div>
 
@@ -165,7 +167,7 @@
           <div class="feature-card">
             <div class="feature-icon"><i class="fa-solid fa-file-signature"></i></div>
             <h3 class="feature-title">10. Audit & Event Logging</h3>
-            <p class="feature-desc">Comprehensive append-only security logging recording authentication events, document access, role switches, and decisions.</p>
+            <p class="feature-desc">In-memory demo events record sign-ins, role-specific actions, and access-denied attempts.</p>
             <span class="security-badge-sm">Accountability & Auditability</span>
           </div>
 
@@ -193,89 +195,48 @@
             <p style="font-size: 0.875rem;">Enter your verified credentials to access your secure portal</p>
           </div>
 
-          <div class="auth-tabs">
-            <div class="auth-tab active" id="tab-login-btn">Account Login</div>
-            <div class="auth-tab" id="tab-register-btn">Student Registration</div>
-          </div>
-
           <!-- Login Form -->
           <form id="login-form">
             <div class="form-group">
-              <label class="form-label" for="login-role">Select User Portal Role</label>
-              <select class="form-input" id="login-role">
-                <option value="STUDENT">Student / Applicant</option>
-                <option value="OFFICER">Scholarship Review Officer</option>
-                <option value="UNIV_OFFICER">University Verification Officer</option>
-                <option value="ADMIN">System & Security Administrator</option>
-              </select>
-            </div>
-
-            <div class="form-group">
               <label class="form-label" for="login-email">Email Address / Student ID</label>
               <div class="form-input-wrap">
-                <input type="email" class="form-input" id="login-email" placeholder="student@university.edu.pk" required value="student@university.edu.pk">
+                <input type="email" class="form-input" id="login-email" placeholder="Choose a demo account below" autocomplete="username" required>
               </div>
             </div>
 
             <div class="form-group">
               <label class="form-label" for="login-password">Password</label>
               <div class="form-input-wrap">
-                <input type="password" class="form-input" id="login-password" placeholder="••••••••••••" required value="ScholarAssist#2026">
+                <input type="password" class="form-input" id="login-password" placeholder="Demo account password" autocomplete="current-password" required>
                 <button type="button" class="input-icon-btn" id="toggle-password-btn" title="Show/Hide Password">
                   <i class="fa-solid fa-eye"></i>
                 </button>
               </div>
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; font-size: 0.85rem;">
-              <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
-                <input type="checkbox" checked> Remember session
-              </label>
-              <a href="#reset" style="color: var(--secondary);">Forgot Password?</a>
-            </div>
-
             <button type="submit" class="btn btn-primary" style="width: 100%;">
-              <i class="fa-solid fa-right-to-bracket"></i> Secure Sign In
+              <i class="fa-solid fa-right-to-bracket"></i> Sign In to Demo
             </button>
           </form>
 
-          <!-- Register Form (Hidden by default) -->
-          <form id="register-form" style="display: none;">
-            <div class="form-group">
-              <label class="form-label" for="reg-name">Full Name (As per CNIC)</label>
-              <input type="text" class="form-input" id="reg-name" placeholder="Abubakar Awan" required>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="reg-cnic">CNIC / B-Form Number (Automatic Format)</label>
-              <input type="text" class="form-input" id="reg-cnic" placeholder="35202-1234567-1" maxlength="15" required>
-              <span style="font-size: 0.75rem; color: var(--text-dim);">Privacy Control: CNIC is encrypted & masked for non-authorized viewers.</span>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="reg-email">University Email</label>
-              <input type="email" class="form-input" id="reg-email" placeholder="student@university.edu.pk" required>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="reg-password">Create Strong Password</label>
-              <input type="password" class="form-input" id="reg-password" placeholder="Minimum 8 characters with symbol" required>
-              <div class="strength-meter">
-                <div class="strength-bar" id="strength-bar"></div>
-              </div>
-              <div class="strength-text" id="strength-text">Password Quality: Evaluated dynamically</div>
-            </div>
-
-            <button type="submit" class="btn btn-accent" style="width: 100%; margin-top: 1rem;">
-              <i class="fa-solid fa-user-plus"></i> Register Student Account
+          <div class="demo-accounts">
+            <h3>Activity 2 Demo Accounts</h3>
+            <p>Select an account to fill the login form. The role is assigned from the credential record.</p>
+            <button class="demo-account-btn" type="button" data-demo-account="STUDENT">
+              <span><strong>Student / Applicant</strong><small>student@university.edu.pk / Student#2026</small></span>
+              <i class="fa-solid fa-arrow-right-to-bracket"></i>
             </button>
-          </form>
+            <button class="demo-account-btn" type="button" data-demo-account="OFFICER">
+              <span><strong>Scholarship Review Officer</strong><small>officer@scholarassist.edu.pk / Officer#2026</small></span>
+              <i class="fa-solid fa-arrow-right-to-bracket"></i>
+            </button>
+          </div>
 
           <!-- Security Awareness Callout -->
           <div class="security-alert-box">
             <i class="fa-solid fa-shield-cat"></i>
             <div>
-              <strong>SSD Security Design Note:</strong> Passwords are never transmitted or saved in plaintext. Production implementation uses Argon2id key derivation with per-user salt and HTTPS transport layer security.
+              <strong>Prototype Security Note:</strong> This static demo checks hard-coded credentials in browser JavaScript; anyone can inspect or bypass them. It is not real authentication or data protection. Production requires server-side identity checks, protected sessions, and secure password hashing.
             </div>
           </div>
         </div>
@@ -286,24 +247,28 @@
          PAGE 3: CORE FUNCTIONAL PAGE - SCHOLARSHIP PORTAL & APPLICATION SYSTEM
          ========================================================================== -->
     <section id="portal-view" class="view-section">
-      <!-- Role Simulation Context Banner -->
-      <div id="reviewer-role-banner" style="display: none; background: rgba(245, 158, 11, 0.15); border: 1px solid var(--warning); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.5rem; font-size: 0.9rem;">
-        <i class="fa-solid fa-clipboard-check" style="color: var(--warning);"></i> <strong>Reviewer Portal Active:</strong> Viewing submitted student applications and performing document authentication checks.
-      </div>
-
-      <div id="admin-role-banner" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid var(--danger); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.5rem; font-size: 0.9rem;">
-        <i class="fa-solid fa-user-gear" style="color: var(--danger);"></i> <strong>Security Administrator Active:</strong> Full system monitoring, STRIDE threat enforcement, and audit log analysis enabled.
-      </div>
-
+      <div id="student-dashboard" class="role-dashboard" hidden>
       <div class="portal-header">
         <div>
-          <h2>Scholarship Search & Eligibility Engine</h2>
-          <p>Find available grants, evaluate your rule-based eligibility transparently, and upload verified credentials.</p>
+          <h2>Student Dashboard</h2>
+          <p>Discover grants, check your eligibility, submit applications, and track decisions.</p>
         </div>
         <div style="display: flex; gap: 0.75rem;">
           <button class="btn btn-secondary btn-sm" id="my-applications-tab" onclick="document.getElementById('my-apps-section').scrollIntoView({behavior:'smooth'})">
             <i class="fa-solid fa-folder-closed"></i> My Applications
           </button>
+        </div>
+      </div>
+
+      <div class="student-profile-card">
+        <div>
+          <span class="section-tag">Signed-in student</span>
+          <h3 id="student-name-display"></h3>
+          <p id="student-email-display"></p>
+        </div>
+        <div>
+          <span class="profile-data-label">Your CNIC (visible only in your student session)</span>
+          <strong id="student-cnic-display"></strong>
         </div>
       </div>
 
@@ -412,6 +377,31 @@
         </div>
         <div id="my-applications-list"></div>
       </div>
+      </div>
+
+      <div id="officer-dashboard" class="role-dashboard" hidden>
+        <div class="portal-header">
+          <div>
+            <div class="section-tag">Scholarship Review Officer</div>
+            <h2>Application Review Dashboard</h2>
+            <p>Review submitted applications, verify document counts, and update application decisions.</p>
+          </div>
+        </div>
+        <div class="glass-card officer-functions">
+          <h3>Officer functions</h3>
+          <ul>
+            <li>Review the submitted scholarship application queue.</li>
+            <li>Check application references and attached-document counts.</li>
+            <li>Update an application to Under Review, Approved, or Rejected.</li>
+          </ul>
+          <p class="privacy-note"><i class="fa-solid fa-eye-slash"></i> Applicant CNICs are masked here; full CNICs are available only in the student’s own session.</p>
+        </div>
+        <div class="section-header" style="text-align: left; margin: 2rem 0 1.5rem;">
+          <h2>Submitted Applications</h2>
+          <p>Status changes are restricted to the Scholarship Review Officer role.</p>
+        </div>
+        <div id="review-applications-list" aria-live="polite"></div>
+      </div>
     </section>
 
     <!-- ==========================================================================
@@ -425,11 +415,11 @@
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem;">
-        <!-- Live Append-Only Audit Stream -->
+        <!-- In-memory Demo Audit Events -->
         <div class="audit-stream-card">
           <div class="audit-header">
-            <h3><i class="fa-solid fa-terminal" style="color: var(--secondary);"></i> Append-Only Audit Stream</h3>
-            <span class="file-security-tag"><i class="fa-solid fa-lock"></i> Immutable Log</span>
+            <h3><i class="fa-solid fa-terminal" style="color: var(--secondary);"></i> In-Memory Demo Audit Events</h3>
+            <span class="file-security-tag"><i class="fa-solid fa-lock"></i> Session-Only</span>
           </div>
           <div id="audit-logs-list" class="audit-logs-container"></div>
         </div>
@@ -445,23 +435,23 @@
 
           <div style="display: flex; flex-direction: column; gap: 0.85rem; font-size: 0.85rem;">
             <div style="background: rgba(15, 23, 42, 0.8); padding: 0.85rem; border-radius: var(--radius-sm); border-left: 3px solid var(--danger);">
-              <strong>Spoofing Identity:</strong> Enforced through session validation, password complexity policies, and salted Argon2 hashing.
+              <strong>Spoofing Identity:</strong> Demo credentials select a role in this prototype. Production authentication and server-side session validation are not implemented.
             </div>
 
             <div style="background: rgba(15, 23, 42, 0.8); padding: 0.85rem; border-radius: var(--radius-sm); border-left: 3px solid var(--warning);">
-              <strong>Tampering with Data:</strong> Prevented using cryptographic checksums (SHA-256) on student application state & parameter sanitization.
+              <strong>Tampering with Data:</strong> Input sanitization is demonstrated; application state is client-side and is not integrity-protected.
             </div>
 
             <div style="background: rgba(15, 23, 42, 0.8); padding: 0.85rem; border-radius: var(--radius-sm); border-left: 3px solid var(--info);">
-              <strong>Repudiation:</strong> Guaranteed via append-only audit event streaming detailing timestamp, actor, IP address, and role context.
+              <strong>Repudiation:</strong> The in-memory demo audit stream records timestamps, actor, and role context; it is not a durable or tamper-proof log.
             </div>
 
             <div style="background: rgba(15, 23, 42, 0.8); padding: 0.85rem; border-radius: var(--radius-sm); border-left: 3px solid var(--secondary);">
-              <strong>Information Disclosure:</strong> Data minimization applied. CNIC numbers masked, uploaded documents restricted by strict RBAC middleware.
+              <strong>Information Disclosure:</strong> The student sees their own CNIC; the review queue shows it masked. These client-side checks do not protect data from a browser user.
             </div>
 
             <div style="background: rgba(15, 23, 42, 0.8); padding: 0.85rem; border-radius: var(--radius-sm); border-left: 3px solid var(--success);">
-              <strong>Elevation of Privilege:</strong> Enforces Principle of Least Privilege across 4 distinct roles (Student, Officer, Univ Officer, Admin).
+              <strong>Elevation of Privilege:</strong> Student and Scholarship Review Officer dashboards use separate role checks for protected actions.
             </div>
           </div>
         </div>
@@ -485,13 +475,13 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">Applicant Name</label>
-        <input type="text" class="form-input" value="Abubakar Awan" readonly style="background: rgba(255,255,255,0.05);">
+        <label class="form-label" for="modal-applicant-name">Applicant Name</label>
+        <input type="text" class="form-input" id="modal-applicant-name" readonly style="background: rgba(255,255,255,0.05);">
       </div>
 
       <div class="form-group">
-        <label class="form-label">CNIC / B-Form Number (Masked)</label>
-        <input type="text" class="form-input" value="35202-*******-1" readonly style="background: rgba(255,255,255,0.05);">
+        <label class="form-label" for="modal-applicant-cnic">Your CNIC / B-Form Number</label>
+        <input type="text" class="form-input" id="modal-applicant-cnic" readonly style="background: rgba(255,255,255,0.05);">
       </div>
 
       <!-- File Upload Sandbox Section -->
@@ -514,39 +504,8 @@
       <div style="margin-top: 1.75rem; display: flex; justify-content: flex-end; gap: 1rem;">
         <button class="btn btn-secondary" onclick="closeModal('application-modal')">Cancel</button>
         <button class="btn btn-primary" id="submit-application-btn">
-          <i class="fa-solid fa-paper-plane"></i> Submit Encrypted Application
+          <i class="fa-solid fa-paper-plane"></i> Submit Demo Application
         </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Role Selection Modal (Demo Switcher) -->
-  <div id="role-select-modal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 500px;">
-      <button class="modal-close-btn" onclick="closeModal('role-select-modal')">&times;</button>
-      <h3 style="margin-bottom: 0.5rem;"><i class="fa-solid fa-users-gear" style="color: var(--secondary);"></i> Select System Role Context</h3>
-      <p style="font-size: 0.875rem; margin-bottom: 1.5rem;">Test role-tailored user interfaces as evaluated in our Secure Security Design project proposal:</p>
-
-      <div style="display: flex; flex-direction: column; gap: 0.85rem;">
-        <div style="padding: 1rem; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-glass); border-radius: var(--radius-md); cursor: pointer; transition: var(--transition);" onclick="selectRole('STUDENT')">
-          <div style="font-weight: 700; color: #06b6d4;"><i class="fa-solid fa-user-graduate"></i> Student / Applicant</div>
-          <p style="font-size: 0.8rem; margin-top: 0.25rem;">Create profile, discover scholarships, test eligibility rules, submit documents & track status.</p>
-        </div>
-
-        <div style="padding: 1rem; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-glass); border-radius: var(--radius-md); cursor: pointer; transition: var(--transition);" onclick="selectRole('OFFICER')">
-          <div style="font-weight: 700; color: #f59e0b;"><i class="fa-solid fa-clipboard-check"></i> Scholarship Review Officer</div>
-          <p style="font-size: 0.8rem; margin-top: 0.25rem;">Publish scholarships, define eligibility thresholds, review applications & verify document authenticity.</p>
-        </div>
-
-        <div style="padding: 1rem; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-glass); border-radius: var(--radius-md); cursor: pointer; transition: var(--transition);" onclick="selectRole('UNIV_OFFICER')">
-          <div style="font-weight: 700; color: #3b82f6;"><i class="fa-solid fa-building-columns"></i> University Verification Officer</div>
-          <p style="font-size: 0.8rem; margin-top: 0.25rem;">Verify student enrollment status, CGPA verification, and academic institution details.</p>
-        </div>
-
-        <div style="padding: 1rem; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-glass); border-radius: var(--radius-md); cursor: pointer; transition: var(--transition);" onclick="selectRole('ADMIN')">
-          <div style="font-weight: 700; color: #ef4444;"><i class="fa-solid fa-user-shield"></i> System & Security Administrator</div>
-          <p style="font-size: 0.8rem; margin-top: 0.25rem;">Manage users & roles, monitor STRIDE security events, investigate audit logs & system settings.</p>
-        </div>
       </div>
     </div>
   </div>
@@ -580,7 +539,7 @@
           <ul style="list-style: none; font-size: 0.875rem; display: flex; flex-direction: column; gap: 0.5rem; color: var(--text-dim);">
             <li>Least Privilege RBAC</li>
             <li>Rule Eligibility Engine</li>
-            <li>Append-Only Audit Logs</li>
+            <li>Demo Audit Events</li>
             <li>File Extension Sandbox</li>
           </ul>
         </div>

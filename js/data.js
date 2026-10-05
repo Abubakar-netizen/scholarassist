@@ -88,7 +88,7 @@ const INITIAL_AUDIT_LOGS = [
     actor: "system_daemon",
     role: "SYSTEM",
     action: "SYS_INITIALIZE_RBAC",
-    details: "RBAC security matrix loaded successfully. 4 roles defined.",
+    details: "Demo role matrix loaded with Student and Scholarship Review Officer roles.",
     type: "SUCCESS"
   },
   {
@@ -96,7 +96,7 @@ const INITIAL_AUDIT_LOGS = [
     actor: "student_042",
     role: "STUDENT",
     action: "AUTH_LOGIN_SUCCESS",
-    details: "Authenticated via MFA/Password. IP: 111.68.102.14",
+    details: "Illustrative student demo-account login event (no MFA or network identity is used).",
     type: "AUTH"
   },
   {
@@ -120,22 +120,12 @@ const INITIAL_AUDIT_LOGS = [
 const USER_ROLES = {
   STUDENT: {
     name: "Student / Applicant",
-    description: "Discovers scholarships, checks rule-based eligibility, submits applications & uploads verified credentials.",
+    description: "Searches scholarships, evaluates eligibility, submits documents, and tracks personal applications.",
     color: "#06b6d4"
   },
   OFFICER: {
     name: "Scholarship Review Officer",
-    description: "Reviews incoming applications, verifies document authenticity, updates approval/rejection state.",
+    description: "Reviews submitted applications, checks attached-document counts, and updates application status.",
     color: "#f59e0b"
-  },
-  UNIV_OFFICER: {
-    name: "University Verification Officer",
-    description: "Verifies student enrollment, CGPA, and academic transcript standing upon official inquiry.",
-    color: "#3b82f6"
-  },
-  ADMIN: {
-    name: "System & Security Administrator",
-    description: "Manages role assignments, monitors STRIDE security logs, audits suspicious file upload attempts.",
-    color: "#ef4444"
   }
 };

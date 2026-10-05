@@ -10,16 +10,19 @@ ScholarAssist is a security-oriented web application designed to connect Pakista
 
 ### 1. Connected Multi-Page Navigation Structure
 - **Page 1 — Home / Landing Page (`#home-view`)**: Project title, mission statement, stats banner (12.5k+ applications, 100% audited), interactive module showcase, and system architecture.
-- **Page 2 — Portal Entry & Authentication (`#login-view`)**: User sign-in & registration form with password show/hide toggle, password strength meter, CNIC formatting (`35202-1234567-1`), and role selector.
-- **Page 3 — Core Functional Page (`#portal-view`)**: Scholarship Search & Filtering, **Dynamic Rule-Based Eligibility Calculator**, Document Sandbox Upload, and My Applications Status Tracker.
-- **Page 4 — Security Audit & STRIDE Matrix (`#audit-view`)**: Live append-only security log stream and comprehensive STRIDE Threat Safeguard matrix.
+- **Page 2 — Portal Entry & Authentication (`#login-view`)**: Sign-in for the two Activity 2 demo users; the credential record determines the role.
+- **Page 3 — Role-Based Portal (`#portal-view`)**: Students search scholarships, calculate eligibility, submit applications, and track their own applications. Scholarship Review Officers see a separate review queue and can update application statuses.
+- **Page 4 — Security Audit & STRIDE Matrix (`#audit-view`)**: In-memory demo audit events and STRIDE safeguards.
 
 ### 2. Interactive JavaScript Functions
 - **Dynamic Rule-Based Eligibility Engine**: Evaluates CGPA ($\ge 2.75$), Monthly Household Income limits, Domicile Province, and Discipline in real-time with instant `ELIGIBLE` / `NOT ELIGIBLE` status badges.
 - **File Upload Security Sandbox**: Accepts `.pdf`, `.png`, `.jpg` files up to 5 MB while detecting and blocking malicious script extensions (`.exe`, `.sh`, `.php`, `.js`) with dynamic security notices.
 - **Show/Hide Password & Entropy Meter**: Toggles visibility and measures password complexity against policy rules.
-- **Role-Based Context Switcher**: Allows live testing of 4 system roles (*Student*, *Scholarship Officer*, *University Officer*, *Security Administrator*).
-- **Append-Only Audit Stream**: Dynamically logs user actions (logins, navigation, rule evaluation, file uploads) with cryptographic checksum simulations.
+- **Credential-Based Role Login**: Demo credentials open either the *Student / Applicant* dashboard or the *Scholarship Review Officer* dashboard. There is no role selector that can override the authenticated demo account.
+- **Restricted Review Action**: Only the Scholarship Review Officer can change an application's status; unauthorized calls display an Access Denied message and are logged.
+- **CNIC Data Minimization**: A student sees their own CNIC in their dashboard. The officer queue displays a masked CNIC.
+- **Session Logout**: Logout clears the active user and temporary uploaded documents, hides both protected dashboards, and returns to sign-in.
+- **Demo Audit Events**: In-memory log records sign-ins, navigation, eligibility checks, file uploads, and access-denied attempts.
 
 ---
 
@@ -27,11 +30,11 @@ ScholarAssist is a security-oriented web application designed to connect Pakista
 
 | Security Topic | Prototype Implementation |
 | :--- | :--- |
-| **Authentication & Password Security** | Password strength policy, show/hide masking toggle, prepare for salted Argon2 hashing. |
-| **Least Privilege Access Control** | Enforces role-based views across 4 system roles (*Student*, *Officer*, *Univ Officer*, *Admin*). |
-| **Data Minimization & Confidentiality** | CNIC automatic formatting & masked display (`35202-*******-1`). |
+| **Authentication & Password Security** | Hard-coded demo credentials are matched locally to demonstrate role selection; this is not production authentication. |
+| **Least Privilege Access Control** | Separate Student and Scholarship Review Officer dashboards; status updates require the Officer role. |
+| **Data Minimization & Confidentiality** | CNIC is displayed in full only in the student's own dashboard and masked in the officer queue. |
 | **Malware & Upload Security Sandbox** | Client-side extension whitelist (`.pdf`, `.png`, `.jpg`) and hazardous extension blocking (`.exe`, `.php`). |
-| **Accountability & Non-Repudiation** | Real-time append-only security audit log recording timestamps, role context, and IP simulation. |
+| **Accountability & Non-Repudiation** | In-memory demonstration events include timestamps and role context; they are not durable or tamper-proof. |
 | **STRIDE Threat Modeling** | Built-in mitigation matrix covering Spoofing, Tampering, Repudiation, Info Disclosure, DoS, and Elevation of Privilege. |
 
 ---
@@ -48,6 +51,25 @@ ScholarAssist is a security-oriented web application designed to connect Pakista
    npx serve .
    ```
 3. Open `http://localhost:8000` in your web browser.
+
+## Activity 2 Demo Accounts and Role Tests
+
+Use these accounts on the Portal Entry page:
+
+| Role | Email | Password | Dashboard functions |
+| :--- | :--- | :--- | :--- |
+| Student / Applicant | `student@university.edu.pk` | `Student#2026` | Search scholarships, evaluate eligibility, submit applications, and track personal application status. |
+| Scholarship Review Officer | `officer@scholarassist.edu.pk` | `Officer#2026` | Review the submitted queue, inspect document counts, and mark applications Under Review, Approved, or Rejected. |
+
+The initial sample application is owned by the demo student so the officer can test the review workflow immediately. To verify the role difference:
+
+1. Sign in with the student account and confirm the student dashboard, full own-CNIC display, and personal application tracker.
+2. Log out, sign in with the officer account, and confirm the separate review queue with a masked CNIC and status-update controls.
+3. While signed in as the student, attempt `window.updateApplicationStatus('APP-2026-8812', 'Approved')` in the browser console. The application must remain unchanged and the UI must show **Access Denied**.
+4. As the officer, update the sample application and sign in again as the student to confirm the new status is reflected in the tracker.
+5. Log out and confirm both protected dashboards are hidden and the portal redirects to sign-in.
+
+**Prototype limitation:** The demo credentials, role checks, application records, uploads, and audit events are all client-side and inspectable/modifiable in a browser. They demonstrate the Activity 2 workflow only; do not use real credentials or personal data. A production service needs server-side authentication and authorization, protected persistence, and server-validated uploads.
 
 ---
 

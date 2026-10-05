@@ -1,3 +1,24 @@
+const DEMO_USERS = [
+  {
+    email: 'student@university.edu.pk',
+    password: 'Student#2026',
+    name: 'Abubakar Awan',
+    role: 'STUDENT',
+    cnic: '35202-1234567-1',
+    cgpa: 3.45,
+    income: 55000,
+    discipline: 'Computer Science',
+    degree: 'BS',
+    province: 'Punjab'
+  },
+  {
+    email: 'officer@scholarassist.edu.pk',
+    password: 'Officer#2026',
+    name: 'Sara Malik',
+    role: 'OFFICER'
+  }
+];
+
 /* ==========================================================================
    ScholarAssist - Main Application Controller
    Handles View Routing, Interactivity, Role-Based Adaptations, 
@@ -8,18 +29,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Application State
   const state = {
     currentView: 'home-view',
-    currentRole: 'STUDENT',
-    user: {
-      isLoggedIn: false,
-      name: 'Abubakar Awan',
-      email: 'student@university.edu.pk',
-      cnic: '35202-1234567-1',
-      cgpa: 3.45,
-      income: 55000,
-      discipline: 'Computer Science',
-      degree: 'BS',
-      province: 'Punjab'
-    },
+    currentRole: 'GUEST',
+    user: null,
     uploadedDocuments: [],
     myApplications: [
       {
@@ -28,6 +39,9 @@ document.addEventListener('DOMContentLoaded', () => {
         appliedDate: "2026-09-28",
         status: "Under Review",
         documentsVerified: 3,
+        applicantEmail: 'student@university.edu.pk',
+        applicantName: 'Abubakar Awan',
+        applicantCnic: '35202-1234567-1',
         hash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       }
     ],
@@ -37,8 +51,17 @@ document.addEventListener('DOMContentLoaded', () => {
   // DOM Elements
   const navLinks = document.querySelectorAll('.nav-link');
   const viewSections = document.querySelectorAll('.view-section');
-  const roleSelectPill = document.getElementById('role-select-pill');
+  const roleSelectPill = document.getElementById('role-indicator');
   const activeRoleName = document.getElementById('active-role-name');
+  const roleDot = roleSelectPill ? roleSelectPill.querySelector('.role-dot') : null;
+  const logoutButton = document.getElementById('logout-btn');
+  const loginNavButton = document.getElementById('login-nav-btn');
+  const studentDashboard = document.getElementById('student-dashboard');
+  const officerDashboard = document.getElementById('officer-dashboard');
+  const studentNameDisplay = document.getElementById('student-name-display');
+  const studentEmailDisplay = document.getElementById('student-email-display');
+  const studentCnicDisplay = document.getElementById('student-cnic-display');
+  const reviewApplicationsList = document.getElementById('review-applications-list');
   const scholarshipContainer = document.getElementById('scholarship-cards-container');
   const searchInput = document.getElementById('scholarship-search-input');
   const fieldFilter = document.getElementById('filter-field');
@@ -66,6 +89,15 @@ document.addEventListener('DOMContentLoaded', () => {
      1. View Router & Navigation
      ========================================================================== */
   function navigateTo(viewId) {
+    if (viewId === 'login-view' && state.user) {
+      showToast('Log out before signing in with another demo account.', 'info');
+      viewId = 'portal-view';
+    }
+    if (viewId === 'portal-view' && !state.user) {
+      showToast('Sign in with a demo account to access the role-specific portal.', 'warning');
+      viewId = 'login-view';
+    }
+
     viewSections.forEach(section => {
       section.classList.remove('active');
     });
@@ -87,13 +119,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Audit Log Navigation Event
       SecurityModule.logEvent({
-        actor: state.user.isLoggedIn ? state.user.email : 'guest_visitor',
+        actor: state.user ? state.user.email : 'guest_visitor',
         role: state.currentRole,
         action: 'NAVIGATE_VIEW',
         details: `Navigated to view: ${viewId}`,
         type: 'INFO'
       });
     }
+  }
+
+  function authorizeRole(requiredRole, action) {
+    if (state.user && state.user.role === requiredRole) return true;
+
+    showToast(`Access Denied: ${action} is restricted to ${requiredRole === 'OFFICER' ? 'Scholarship Review Officers' : 'students'}.`, 'danger');
+    SecurityModule.logEvent({
+      actor: state.user ? state.user.email : 'guest_visitor',
+      role: state.currentRole,
+      action: 'ACCESS_DENIED',
+      details: `Blocked ${action}; required role: ${requiredRole}`,
+      type: 'WARN'
+    });
+    return false;
   }
 
   // Bind nav click events
@@ -114,47 +160,67 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* ==========================================================================
-     2. Interactive Role-Based Switcher (SSD Demo Feature)
+     2. Credential-Based Role Login & Session Controls
      ========================================================================== */
-  const roleModal = document.getElementById('role-select-modal');
-  if (roleSelectPill) {
-    roleSelectPill.addEventListener('click', () => {
-      roleModal.classList.add('active');
-    });
+  function renderRoleDashboard() {
+    const isStudent = Boolean(state.user && state.user.role === 'STUDENT');
+    const isOfficer = Boolean(state.user && state.user.role === 'OFFICER');
+    const roleData = state.user ? USER_ROLES[state.user.role] : null;
+
+    if (studentDashboard) studentDashboard.hidden = !isStudent;
+    if (officerDashboard) officerDashboard.hidden = !isOfficer;
+    if (logoutButton) logoutButton.hidden = !state.user;
+    if (loginNavButton) loginNavButton.hidden = Boolean(state.user);
+    if (activeRoleName) {
+      activeRoleName.textContent = roleData ? roleData.name : 'Guest';
+    }
+    if (roleDot) {
+      roleDot.style.backgroundColor = roleData ? roleData.color : '#6b7280';
+    }
+    if (studentNameDisplay) studentNameDisplay.textContent = isStudent ? state.user.name : '';
+    if (studentEmailDisplay) studentEmailDisplay.textContent = isStudent ? state.user.email : '';
+    if (studentCnicDisplay) studentCnicDisplay.textContent = isStudent ? state.user.cnic : '';
+
+    renderMyApplications();
+    renderReviewApplications();
   }
 
-  window.selectRole = function(roleKey) {
-    if (USER_ROLES[roleKey]) {
-      state.currentRole = roleKey;
-      const roleData = USER_ROLES[roleKey];
-      activeRoleName.textContent = roleData.name;
-      roleSelectPill.querySelector('.role-dot').style.backgroundColor = roleData.color;
-
-      roleModal.classList.remove('active');
-
-      showToast(`Switched view context to ${roleData.name}`, 'info');
-
+  if (logoutButton) {
+    logoutButton.addEventListener('click', () => {
+      state.user = null;
+      state.currentRole = 'GUEST';
+      state.uploadedDocuments = [];
+      if (applicationModal) applicationModal.classList.remove('active');
+      if (loginForm) loginForm.reset();
+      if (passwordInput) {
+        passwordInput.value = '';
+        passwordInput.type = 'password';
+      }
+      if (togglePasswordBtn) togglePasswordBtn.innerHTML = '<i class="fa-solid fa-eye"></i>';
+      if (fileInput) fileInput.value = '';
+      if (inputEligCgpa) inputEligCgpa.value = '';
+      if (inputEligIncome) inputEligIncome.value = '';
+      if (inputEligProvince) inputEligProvince.value = '';
+      if (inputEligDiscipline) inputEligDiscipline.value = '';
+      document.getElementById('modal-applicant-name').value = '';
+      document.getElementById('modal-applicant-cnic').value = '';
+      eligOutputBadge.textContent = 'SIGN IN TO CHECK ELIGIBILITY';
+      eligOutputBadge.className = 'status-badge-lg';
+      eligOutputDesc.textContent = 'Sign in with the student demo account to evaluate scholarship rules.';
+      eligMatchList.replaceChildren();
+      activeApplyingScholarship = null;
+      renderUploadedDocuments();
+      renderRoleDashboard();
+      navigateTo('login-view');
+      showToast('You have been logged out. The demo session has been cleared.', 'info');
       SecurityModule.logEvent({
-        actor: state.user.email,
-        role: roleKey,
-        action: 'ROLE_CONTEXT_SWITCH',
-        details: `Switched active role simulator to ${roleKey}`,
-        type: 'WARN'
+        actor: 'guest_visitor',
+        role: 'GUEST',
+        action: 'AUTH_LOGOUT',
+        details: 'Cleared the active demo user and temporary uploaded documents.',
+        type: 'AUTH'
       });
-
-      // Update UI elements sensitive to role
-      adaptUIForRole(roleKey);
-    }
-  };
-
-  function adaptUIForRole(roleKey) {
-    const reviewerBanner = document.getElementById('reviewer-role-banner');
-    const adminBanner = document.getElementById('admin-role-banner');
-    const studentAppTab = document.getElementById('my-applications-tab');
-
-    if (reviewerBanner) reviewerBanner.style.display = (roleKey === 'OFFICER' || roleKey === 'UNIV_OFFICER') ? 'block' : 'none';
-    if (adminBanner) adminBanner.style.display = (roleKey === 'ADMIN') ? 'block' : 'none';
-    if (studentAppTab) studentAppTab.style.display = (roleKey === 'STUDENT') ? 'block' : 'none';
+    });
   }
 
   /* ==========================================================================
@@ -298,7 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     SecurityModule.logEvent({
-      actor: state.user.email,
+      actor: state.user ? state.user.email : 'guest_visitor',
       role: state.currentRole,
       action: 'ELIGIBILITY_RULE_EVALUATED',
       details: `CGPA: ${cgpa}, Income: PKR ${income}, Matched: ${eligibleList.length}`,
@@ -312,6 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (inputEligProvince) inputEligProvince.addEventListener('change', evaluateEligibilityEngine);
 
   window.evaluateScholarshipEligibility = function(schId) {
+    if (!authorizeRole('STUDENT', 'Eligibility evaluation')) return;
     const sch = SCHOLARSHIPS_DATA.find(s => s.id === schId);
     if (sch) {
       navigateTo('portal-view');
@@ -326,13 +393,8 @@ document.addEventListener('DOMContentLoaded', () => {
      5. Authentication & Security Form Interactions
      ========================================================================== */
   const loginForm = document.getElementById('login-form');
-  const registerForm = document.getElementById('register-form');
   const passwordInput = document.getElementById('login-password');
   const togglePasswordBtn = document.getElementById('toggle-password-btn');
-  const regPasswordInput = document.getElementById('reg-password');
-  const strengthBar = document.getElementById('strength-bar');
-  const strengthText = document.getElementById('strength-text');
-  const cnicInput = document.getElementById('reg-cnic');
 
   // Toggle Password Visibility
   if (togglePasswordBtn && passwordInput) {
@@ -342,7 +404,7 @@ document.addEventListener('DOMContentLoaded', () => {
       togglePasswordBtn.innerHTML = type === 'password' ? '<i class="fa-solid fa-eye"></i>' : '<i class="fa-solid fa-eye-slash"></i>';
       
       SecurityModule.logEvent({
-        actor: 'user_interaction',
+        actor: state.user ? state.user.email : 'guest_visitor',
         role: state.currentRole,
         action: 'AUTH_PASSWORD_TOGGLE',
         details: `Password field visibility toggled to ${type}`,
@@ -351,70 +413,67 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Real-Time Password Strength Meter (Register Form)
-  if (regPasswordInput && strengthBar && strengthText) {
-    regPasswordInput.addEventListener('input', (e) => {
-      const val = e.target.value;
-      const res = SecurityModule.evaluatePasswordSecurity(val);
-      strengthBar.style.width = `${res.score}%`;
-      strengthBar.style.backgroundColor = res.color;
-      strengthText.textContent = `Password Quality: ${res.label}`;
-      strengthText.style.color = res.color;
+  document.querySelectorAll('[data-demo-account]').forEach(button => {
+    button.addEventListener('click', () => {
+      const account = DEMO_USERS.find(user => user.role === button.dataset.demoAccount);
+      if (!account) return;
+      document.getElementById('login-email').value = account.email;
+      passwordInput.value = account.password;
     });
-  }
-
-  // Automatic Hyphen Formatting for CNIC Input
-  if (cnicInput) {
-    cnicInput.addEventListener('input', (e) => {
-      e.target.value = SecurityModule.formatCNIC(e.target.value);
-    });
-  }
-
-  // Login / Register Tab Toggle
-  const tabLoginBtn = document.getElementById('tab-login-btn');
-  const tabRegisterBtn = document.getElementById('tab-register-btn');
-
-  if (tabLoginBtn && tabRegisterBtn && loginForm && registerForm) {
-    tabLoginBtn.addEventListener('click', () => {
-      tabLoginBtn.classList.add('active');
-      tabRegisterBtn.classList.remove('active');
-      loginForm.style.display = 'block';
-      registerForm.style.display = 'none';
-    });
-
-    tabRegisterBtn.addEventListener('click', () => {
-      tabRegisterBtn.classList.add('active');
-      tabLoginBtn.classList.remove('active');
-      registerForm.style.display = 'block';
-      loginForm.style.display = 'none';
-    });
-  }
+  });
 
   // Login Form Submission Handler
   if (loginForm) {
     loginForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const email = document.getElementById('login-email').value;
+      if (state.user) {
+        showToast('Log out before signing in with another demo account.', 'warning');
+        return;
+      }
+      const email = document.getElementById('login-email').value.trim().toLowerCase();
       const pass = passwordInput.value;
+      const account = DEMO_USERS.find(user => user.email === email && user.password === pass);
 
-      if (!email || !pass) {
-        showToast('Please provide valid credentials.', 'danger');
+      if (!account) {
+        showToast('Access Denied: demo email or password is incorrect.', 'danger');
+        SecurityModule.logEvent({
+          actor: 'unknown_user',
+          role: 'GUEST',
+          action: 'AUTH_LOGIN_FAILED',
+          details: 'Rejected invalid demo credentials.',
+          type: 'WARN'
+        });
         return;
       }
 
-      state.user.isLoggedIn = true;
-      state.user.email = email;
-
-      showToast(`Welcome back, ${email}! Authenticated securely.`, 'success');
-      
+      state.user = {
+        name: account.name,
+        email: account.email,
+        role: account.role,
+        cnic: account.cnic,
+        cgpa: account.cgpa,
+        income: account.income,
+        discipline: account.discipline,
+        degree: account.degree,
+        province: account.province
+      };
+      state.currentRole = account.role;
+      if (account.role === 'STUDENT') {
+        inputEligCgpa.value = account.cgpa;
+        inputEligIncome.value = account.income;
+        inputEligProvince.value = account.province;
+        inputEligDiscipline.value = account.discipline;
+        evaluateEligibilityEngine();
+      }
+      renderRoleDashboard();
+      showToast(`Welcome, ${account.name}. Your ${account.role === 'STUDENT' ? 'student' : 'officer'} dashboard is ready.`, 'success');
       SecurityModule.logEvent({
-        actor: email,
-        role: state.currentRole,
+        actor: account.email,
+        role: account.role,
         action: 'AUTH_LOGIN_SUCCESS',
-        details: 'User authenticated with multi-factor authentication ready token.',
+        details: `Authenticated demo account for ${account.role}.`,
         type: 'AUTH'
       });
-
       navigateTo('portal-view');
     });
   }
@@ -454,6 +513,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function handleFileSelection(file) {
+    if (!authorizeRole('STUDENT', 'Document upload')) return;
     const result = SecurityModule.validateFileUpload(file);
 
     if (!result.valid) {
@@ -469,16 +529,16 @@ document.addEventListener('DOMContentLoaded', () => {
       name: file.name,
       size: result.sizeFormatted,
       type: file.type || 'application/pdf',
-      status: 'VERIFIED_CLEAN',
+      status: 'CLIENT_CHECKED',
       uploadTime: new Date().toLocaleTimeString()
     };
 
     state.uploadedDocuments.push(docObj);
     renderUploadedDocuments();
-    showToast(`Document '${file.name}' validated and attached securely.`, 'success');
+    showToast(`Document '${file.name}' passed the client-side demo checks.`, 'success');
 
     SecurityModule.logEvent({
-      actor: state.user.email,
+      actor: state.user ? state.user.email : 'guest_visitor',
       role: state.currentRole,
       action: 'DOC_UPLOAD_VALIDATED',
       details: `Passed client sandbox inspection: ${file.name} (${result.sizeFormatted})`,
@@ -504,7 +564,7 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
         <div style="display: flex; align-items: center; gap: 0.5rem;">
-          <span class="file-security-tag"><i class="fa-solid fa-shield-check"></i> AES-256</span>
+          <span class="file-security-tag"><i class="fa-solid fa-shield-check"></i> Validated (demo)</span>
           <button class="btn btn-danger btn-sm" onclick="removeDocument('${doc.id}')"><i class="fa-solid fa-trash"></i></button>
         </div>
       </div>
@@ -512,6 +572,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   window.removeDocument = function(docId) {
+    if (!authorizeRole('STUDENT', 'Document removal')) return;
     state.uploadedDocuments = state.uploadedDocuments.filter(d => d.id !== docId);
     renderUploadedDocuments();
     showToast('Document removed.', 'info');
@@ -523,20 +584,25 @@ document.addEventListener('DOMContentLoaded', () => {
   let activeApplyingScholarship = null;
 
   window.openApplicationModal = function(schId) {
+    if (!authorizeRole('STUDENT', 'Application submission')) return;
     const sch = SCHOLARSHIPS_DATA.find(s => s.id === schId);
     if (!sch) return;
 
     activeApplyingScholarship = sch;
     const modalTitle = document.getElementById('modal-scholarship-title');
     const modalDesc = document.getElementById('modal-scholarship-desc');
+    const applicantName = document.getElementById('modal-applicant-name');
+    const applicantCnic = document.getElementById('modal-applicant-cnic');
 
     if (modalTitle) modalTitle.textContent = sch.title;
     if (modalDesc) modalDesc.textContent = `${sch.organization} • Grant: ${sch.amount}`;
+    if (applicantName) applicantName.value = state.user.name;
+    if (applicantCnic) applicantCnic.value = state.user.cnic;
 
     applicationModal.classList.add('active');
 
     SecurityModule.logEvent({
-      actor: state.user.email,
+      actor: state.user ? state.user.email : 'guest_visitor',
       role: state.currentRole,
       action: 'APPLICATION_DRAFT_OPEN',
       details: `Initiated application draft for ${schId}`,
@@ -552,18 +618,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const submitAppBtn = document.getElementById('submit-application-btn');
   if (submitAppBtn) {
     submitAppBtn.addEventListener('click', () => {
+      if (!authorizeRole('STUDENT', 'Application submission')) return;
       if (state.uploadedDocuments.length === 0) {
         showToast('Security Rule: Please attach at least 1 verified document (CNIC or Transcript) before submitting.', 'warning');
         return;
       }
 
-      const appId = `APP-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+      const appId = `APP-${Date.now()}`;
       const newApp = {
         id: appId,
         scholarshipTitle: activeApplyingScholarship ? activeApplyingScholarship.title : 'Scholarship Program',
         appliedDate: new Date().toISOString().split('T')[0],
         status: 'Submitted',
         documentsVerified: state.uploadedDocuments.length,
+        applicantEmail: state.user.email,
+        applicantName: state.user.name,
+        applicantCnic: state.user.cnic,
         hash: "a4f891b2c3d4e5f67890123456789abcdef0123456789abcdef0123456789abc"
       };
 
@@ -574,7 +644,7 @@ document.addEventListener('DOMContentLoaded', () => {
       showToast(`Application ${appId} submitted successfully! Received digital verification receipt.`, 'success');
 
       SecurityModule.logEvent({
-        actor: state.user.email,
+        actor: state.user ? state.user.email : 'guest_visitor',
         role: state.currentRole,
         action: 'APPLICATION_SUBMIT_SUCCESS',
         details: `Submitted application ${appId} with ${state.uploadedDocuments.length} document attachments.`,
@@ -587,20 +657,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('my-applications-list');
     if (!container) return;
 
-    if (state.myApplications.length === 0) {
+    if (!state.user || state.user.role !== 'STUDENT') {
+      container.replaceChildren();
+      return;
+    }
+
+    const applications = state.myApplications.filter(app => app.applicantEmail === state.user.email);
+    if (applications.length === 0) {
       container.innerHTML = '<p>No active applications found.</p>';
       return;
     }
 
-    container.innerHTML = state.myApplications.map(app => `
+    container.innerHTML = applications.map(app => `
       <div style="background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
         <div>
-          <span class="status-badge-lg eligible" style="font-size: 0.75rem; padding: 0.2rem 0.6rem;">${app.status}</span>
+          <span class="status-badge-lg ${app.status === 'Approved' ? 'eligible' : app.status === 'Rejected' ? 'ineligible' : 'partial'}" style="font-size: 0.75rem; padding: 0.2rem 0.6rem;">${SecurityModule.sanitizeHTML(app.status)}</span>
           <h4 style="margin-top: 0.5rem;">${SecurityModule.sanitizeHTML(app.scholarshipTitle)}</h4>
-          <div style="font-size: 0.8rem; color: var(--text-dim);">Application Ref: ${app.id} • Submitted: ${app.appliedDate}</div>
+          <div style="font-size: 0.8rem; color: var(--text-dim);">Application Ref: ${SecurityModule.sanitizeHTML(app.id)} • Submitted: ${SecurityModule.sanitizeHTML(app.appliedDate)}</div>
         </div>
         <div>
-          <button class="btn btn-secondary btn-sm" onclick="viewAuditReceipt('${app.id}', '${app.hash}')">
+          <button class="btn btn-secondary btn-sm" data-receipt-id="${SecurityModule.sanitizeHTML(app.id)}">
             <i class="fa-solid fa-shield-halved"></i> Audit Receipt
           </button>
         </div>
@@ -608,8 +684,82 @@ document.addEventListener('DOMContentLoaded', () => {
     `).join('');
   }
 
-  window.viewAuditReceipt = function(appId, hash) {
-    alert(`ScholarAssist Security Digital Receipt\n===================================\nApplication ID: ${appId}\nStatus: SUBMITTED & INTEGRITY VERIFIED\nCryptographic SHA-256 Hash:\n${hash}\n\n[Non-Repudiation Control Active]`);
+  if (document.getElementById('my-applications-list')) {
+    document.getElementById('my-applications-list').addEventListener('click', (event) => {
+      const receiptButton = event.target.closest('[data-receipt-id]');
+      if (receiptButton) window.viewAuditReceipt(receiptButton.dataset.receiptId);
+    });
+  }
+
+  function renderReviewApplications() {
+    if (!reviewApplicationsList) return;
+    if (!state.user || state.user.role !== 'OFFICER') {
+      reviewApplicationsList.replaceChildren();
+      return;
+    }
+    if (state.myApplications.length === 0) {
+      reviewApplicationsList.innerHTML = '<p>No applications are waiting for review.</p>';
+      return;
+    }
+
+    reviewApplicationsList.innerHTML = state.myApplications.map(app => `
+      <article class="review-application-card">
+        <div>
+          <span class="status-badge-lg ${app.status === 'Approved' ? 'eligible' : app.status === 'Rejected' ? 'ineligible' : 'partial'}">${SecurityModule.sanitizeHTML(app.status)}</span>
+          <h3>${SecurityModule.sanitizeHTML(app.scholarshipTitle)}</h3>
+          <p>Application: ${SecurityModule.sanitizeHTML(app.id)} · Applicant: ${SecurityModule.sanitizeHTML(app.applicantName)} · CNIC: ${SecurityModule.sanitizeHTML(SecurityModule.maskCNIC(app.applicantCnic))}</p>
+          <p>${app.documentsVerified} document(s) · Submitted: ${SecurityModule.sanitizeHTML(app.appliedDate)}</p>
+        </div>
+        <div class="review-actions" aria-label="Update application status">
+          <button class="btn btn-secondary btn-sm" data-application-id="${SecurityModule.sanitizeHTML(app.id)}" data-next-status="Under Review">Under Review</button>
+          <button class="btn btn-accent btn-sm" data-application-id="${SecurityModule.sanitizeHTML(app.id)}" data-next-status="Approved">Approve</button>
+          <button class="btn btn-danger btn-sm" data-application-id="${SecurityModule.sanitizeHTML(app.id)}" data-next-status="Rejected">Reject</button>
+        </div>
+      </article>
+    `).join('');
+  }
+
+  if (reviewApplicationsList) {
+    reviewApplicationsList.addEventListener('click', (event) => {
+      const statusButton = event.target.closest('[data-application-id][data-next-status]');
+      if (statusButton) {
+        window.updateApplicationStatus(statusButton.dataset.applicationId, statusButton.dataset.nextStatus);
+      }
+    });
+  }
+
+  window.updateApplicationStatus = function(appId, nextStatus) {
+    if (!authorizeRole('OFFICER', 'Application status updates')) return;
+    const allowedStatuses = ['Under Review', 'Approved', 'Rejected'];
+    const application = state.myApplications.find(app => app.id === appId);
+    if (!application || !allowedStatuses.includes(nextStatus)) {
+      showToast('Unable to update this application with the requested status.', 'danger');
+      return;
+    }
+
+    application.status = nextStatus;
+    renderRoleDashboard();
+    showToast(`Application ${appId} marked ${nextStatus}.`, 'success');
+    SecurityModule.logEvent({
+      actor: state.user.email,
+      role: state.currentRole,
+      action: 'APPLICATION_STATUS_UPDATED',
+      details: `Updated ${appId} to ${nextStatus}.`,
+      type: 'SUCCESS'
+    });
+  };
+
+  window.viewAuditReceipt = function(appId) {
+    if (!state.user) {
+      authorizeRole('STUDENT', 'Audit receipt access');
+      return;
+    }
+    const application = state.myApplications.find(app => app.id === appId);
+    if (!application || (state.user.role === 'STUDENT' && application.applicantEmail !== state.user.email)) {
+      showToast('Access Denied: that application receipt is not available to this account.', 'danger');
+      return;
+    }
+    alert(`ScholarAssist Demo Application Receipt\n=====================================\nApplication ID: ${application.id}\nCurrent status: ${application.status}\nDemo integrity value:\n${application.hash}\n\nThis client-side receipt is illustrative, not a verified cryptographic signature.`);
   };
 
   /* ==========================================================================
@@ -619,11 +769,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!auditLogsContainer) return;
 
     auditLogsContainer.innerHTML = INITIAL_AUDIT_LOGS.map(log => `
-      <div class="audit-log-entry ${log.type}">
-        <span>${log.timestamp}</span>
-        <span style="color: var(--secondary); font-weight: 600;">[${log.role}]</span>
-        <span><strong>${log.action}</strong>: ${SecurityModule.sanitizeHTML(log.details)}</span>
-        <span style="text-align: right; color: var(--text-dim);">${log.actor}</span>
+      <div class="audit-log-entry ${SecurityModule.sanitizeHTML(log.type)}">
+        <span>${SecurityModule.sanitizeHTML(log.timestamp)}</span>
+        <span style="color: var(--secondary); font-weight: 600;">[${SecurityModule.sanitizeHTML(log.role)}]</span>
+        <span><strong>${SecurityModule.sanitizeHTML(log.action)}</strong>: ${SecurityModule.sanitizeHTML(log.details)}</span>
+        <span style="text-align: right; color: var(--text-dim);">${SecurityModule.sanitizeHTML(log.actor)}</span>
       </div>
     `).join('');
   };
@@ -662,7 +812,7 @@ document.addEventListener('DOMContentLoaded', () => {
      ========================================================================== */
   renderScholarships(state.filteredScholarships);
   evaluateEligibilityEngine();
+  renderRoleDashboard();
   renderUploadedDocuments();
-  renderMyApplications();
   window.renderAuditLogs();
 });

@@ -200,13 +200,8 @@ a:hover { color: var(--primary); }
   font-size: 0.825rem;
   font-weight: 600;
   color: var(--text-muted);
-  cursor: pointer;
+  cursor: default;
   transition: var(--transition);
-}
-
-.role-pill:hover {
-  border-color: var(--secondary);
-  color: var(--text-main);
 }
 
 .role-dot {
@@ -986,3 +981,128 @@ a:hover { color: var(--primary); }
 .toast.success { border-left-color: var(--success); }
 .toast.danger { border-left-color: var(--danger); }
 .toast.warning { border-left-color: var(--warning); }
+
+[hidden] {
+  display: none !important;
+}
+
+.demo-accounts {
+  display: grid;
+  gap: 0.65rem;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  background: rgba(15, 23, 42, 0.6);
+}
+
+.demo-accounts h3 {
+  font-size: 1rem;
+}
+
+.demo-accounts > p,
+.demo-account-btn small {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.demo-account-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text-main);
+  text-align: left;
+  cursor: pointer;
+}
+
+.demo-account-btn:hover,
+.demo-account-btn:focus-visible {
+  border-color: var(--secondary);
+}
+
+.demo-account-btn span {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.demo-account-btn i {
+  color: var(--secondary);
+}
+
+.student-profile-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: center;
+  margin: 0 0 2rem;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-lg);
+  background: var(--bg-glass);
+}
+
+.student-profile-card h3 {
+  margin: 0.25rem 0;
+}
+
+.student-profile-card p,
+.profile-data-label {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.student-profile-card > div:last-child {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.officer-functions {
+  margin-bottom: 1.5rem;
+}
+
+.officer-functions ul {
+  margin: 0.75rem 0 1rem 1.25rem;
+  color: var(--text-muted);
+}
+
+.privacy-note {
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-glass);
+  font-size: 0.85rem;
+}
+
+.review-application-card {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 1.25rem;
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+}
+
+.review-application-card h3 {
+  margin: 0.35rem 0;
+  font-size: 1.1rem;
+}
+
+.review-application-card p {
+  font-size: 0.85rem;
+}
+
+.review-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .student-profile-card {
+    grid-template-columns: 1fr;
+  }
+}
