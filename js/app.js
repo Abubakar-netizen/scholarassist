@@ -32,6 +32,17 @@ document.addEventListener('DOMContentLoaded', () => {
     currentRole: 'GUEST',
     user: null,
     uploadedDocuments: [],
+    activity3Submissions: [
+      {
+        id: 'ACT-3-1001',
+        applicant: 'Abubakar Awan',
+        scholarship: 'HEC Need-Based Scholarship',
+        cgpa: 3.45,
+        income: 55000,
+        note: 'Strong academic performance and need-based assessment.',
+        status: 'Eligible'
+      }
+    ],
     myApplications: [
       {
         id: "APP-2026-8812",
@@ -80,6 +91,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Audit Logs Container
   const auditLogsContainer = document.getElementById('audit-logs-list');
+
+  // Activity 3 module elements
+  const moduleTabs = document.querySelectorAll('.module-tab');
+  const activityModulePanels = document.querySelectorAll('.activity-module-panel');
+  const activityAppForm = document.getElementById('activity3-application-form');
+  const activityAppFeedback = document.getElementById('module-application-feedback');
+  const activitySubmissionsList = document.getElementById('activity3-submissions-list');
+  const activitySearchInput = document.getElementById('activity3-search');
+  const activityTypeFilter = document.getElementById('activity3-type-filter');
+  const activityTrackerList = document.getElementById('activity3-tracker-list');
 
   // Modal Elements
   const applicationModal = document.getElementById('application-modal');
@@ -222,6 +243,129 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   }
+
+  function setActivityFeedback(message, type = 'success') {
+    if (!activityAppFeedback) return;
+    activityAppFeedback.textContent = message;
+    activityAppFeedback.className = `module-feedback ${type}`;
+  }
+
+  function renderActivitySubmissions() {
+    if (!activitySubmissionsList) return;
+
+    if (!state.activity3Submissions.length) {
+      activitySubmissionsList.innerHTML = '<div class="empty-state">No submissions yet. Submit a scholarship application to see it here.</div>';
+      return;
+    }
+
+    activitySubmissionsList.innerHTML = state.activity3Submissions.map(item => `
+      <div class="record-card">
+        <div>
+          <h4>${SecurityModule.sanitizeHTML(item.scholarship)}</h4>
+          <div class="record-meta">Applicant: ${SecurityModule.sanitizeHTML(item.applicant)} • CGPA: ${item.cgpa} • Income: PKR ${Number(item.income).toLocaleString()}</div>
+          <div class="record-meta">Note: ${SecurityModule.sanitizeHTML(item.note || 'No extra note provided')}</div>
+        </div>
+        <div>
+          <span class="status-pill ${item.status === 'Eligible' ? 'eligible' : 'pending'}">${item.status}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderActivityTracker() {
+    if (!activityTrackerList) return;
+
+    const keyword = (activitySearchInput ? activitySearchInput.value : '').trim().toLowerCase();
+    const type = activityTypeFilter ? activityTypeFilter.value : 'all';
+
+    const items = SCHOLARSHIPS_DATA.filter(item => {
+      const containsText = !keyword || item.title.toLowerCase().includes(keyword) || item.organization.toLowerCase().includes(keyword);
+      const matchesType = type === 'all' || item.category === type;
+      return containsText && matchesType;
+    });
+
+    if (!items.length) {
+      activityTrackerList.innerHTML = '<div class="empty-state">No matching scholarships found for this filter.</div>';
+      return;
+    }
+
+    activityTrackerList.innerHTML = items.map(item => `
+      <div class="record-card">
+        <div>
+          <h4>${SecurityModule.sanitizeHTML(item.title)}</h4>
+          <div class="record-meta">Type: ${SecurityModule.sanitizeHTML(item.category)} • Amount: ${item.amount} • Deadline: ${item.deadline}</div>
+        </div>
+        <div>
+          <span class="status-pill ${item.category === 'Need-Based' ? 'pending' : 'eligible'}">${item.category}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  if (moduleTabs.length) {
+    moduleTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const target = tab.dataset.moduleTab;
+        moduleTabs.forEach(btn => btn.classList.toggle('active', btn === tab));
+        activityModulePanels.forEach(panel => panel.classList.toggle('active', panel.id === target));
+      });
+    });
+  }
+
+  if (activityAppForm) {
+    activityAppForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      const applicant = document.getElementById('activity3-student-name').value.trim();
+      const scholarship = document.getElementById('activity3-scholarship').value.trim();
+      const cgpa = parseFloat(document.getElementById('activity3-cgpa').value);
+      const income = parseFloat(document.getElementById('activity3-income').value);
+      const note = document.getElementById('activity3-note').value.trim();
+
+      if (!applicant || !scholarship || Number.isNaN(cgpa) || Number.isNaN(income)) {
+        setActivityFeedback('Please complete all required fields before submitting the scholarship application.', 'error');
+        return;
+      }
+
+      if (cgpa < 2.75) {
+        setActivityFeedback('CGPA is below the minimum threshold for scholarship consideration. Please check the value and try again.', 'error');
+        return;
+      }
+
+      const newSubmission = {
+        id: `ACT-3-${String(state.activity3Submissions.length + 1001)}`,
+        applicant,
+        scholarship,
+        cgpa,
+        income,
+        note: note || 'No additional note provided.',
+        status: cgpa >= 3.0 && income <= 70000 ? 'Eligible' : 'Pending'
+      };
+
+      state.activity3Submissions.unshift(newSubmission);
+      activityAppForm.reset();
+      renderActivitySubmissions();
+      setActivityFeedback(`Application submitted successfully for ${newSubmission.scholarship}.`, 'success');
+      SecurityModule.logEvent({
+        actor: state.user ? state.user.email : 'guest_visitor',
+        role: state.currentRole,
+        action: 'MODULE_SUBMISSION_CREATED',
+        details: `New scholarship request created: ${newSubmission.scholarship}`,
+        type: 'INFO'
+      });
+    });
+  }
+
+  if (activitySearchInput) {
+    activitySearchInput.addEventListener('input', renderActivityTracker);
+  }
+
+  if (activityTypeFilter) {
+    activityTypeFilter.addEventListener('change', renderActivityTracker);
+  }
+
+  renderActivitySubmissions();
+  renderActivityTracker();
 
   /* ==========================================================================
      3. Scholarship Search & Real-Time Filtering

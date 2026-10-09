@@ -24,6 +24,11 @@ ScholarAssist is a security-oriented web application designed to connect Pakista
 - **Session Logout**: Logout clears the active user and temporary uploaded documents, hides both protected dashboards, and returns to sign-in.
 - **Demo Audit Events**: In-memory log records sign-ins, navigation, eligibility checks, file uploads, and access-denied attempts.
 
+### 3. Activity 3: Parallel Module Development & Integration
+- **Module 1 — Scholarship Application Intake**: Students can submit scholarship requests with required fields, validation, and immediate feedback on the page.
+- **Module 2 — Opportunity Tracker**: Students can search and filter available scholarship programs by keyword and award type using local sample data.
+- **Integrated Portal Design**: Both modules are accessible within the same ScholarAssist dashboard and use consistent styling and navigation patterns.
+
 ---
 
 ## 🔒 Security Design Principles Implemented (SSD Focus)

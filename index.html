@@ -272,6 +272,91 @@
         </div>
       </div>
 
+      <div class="module-tabs" aria-label="Activity 3 module navigation">
+        <button class="module-tab active" type="button" data-module-tab="module-application">
+          <i class="fa-solid fa-file-circle-check"></i> Module 1: Application Intake
+        </button>
+        <button class="module-tab" type="button" data-module-tab="module-tracker">
+          <i class="fa-solid fa-clipboard-list"></i> Module 2: Opportunity Tracker
+        </button>
+      </div>
+
+      <div id="module-application" class="activity-module-panel active">
+        <div class="module-panel-header">
+          <div>
+            <span class="section-tag">Activity 3 Module 1</span>
+            <h3>Scholarship Application Intake</h3>
+          </div>
+        </div>
+
+        <form id="activity3-application-form" class="activity-form">
+          <div class="activity-form-grid">
+            <div class="form-group">
+              <label class="form-label" for="activity3-student-name">Applicant Name</label>
+              <input type="text" id="activity3-student-name" class="form-input" placeholder="Enter full name" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="activity3-scholarship">Scholarship</label>
+              <select id="activity3-scholarship" class="form-input" required>
+                <option value="">Select a scholarship</option>
+                <option value="HEC Need-Based Scholarship">HEC Need-Based Scholarship</option>
+                <option value="Ehsaas Undergraduate Scholarship">Ehsaas Undergraduate Scholarship</option>
+                <option value="PEEF Merit Scholarship">PEEF Merit Scholarship</option>
+                <option value="Ignite ICT Scholarship">Ignite ICT Scholarship</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="activity3-cgpa">CGPA</label>
+              <input type="number" id="activity3-cgpa" class="form-input" min="0" max="4" step="0.01" placeholder="e.g. 3.45" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="activity3-income">Monthly Household Income (PKR)</label>
+              <input type="number" id="activity3-income" class="form-input" min="0" step="500" placeholder="e.g. 45000" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="activity3-note">Additional Information</label>
+            <textarea id="activity3-note" class="form-input" rows="4" placeholder="Briefly explain your academic need or reason for applying..."></textarea>
+          </div>
+          <div class="activity-form-actions">
+            <button class="btn btn-primary" type="submit"><i class="fa-solid fa-paper-plane"></i> Submit Application</button>
+            <button class="btn btn-secondary" type="reset"><i class="fa-solid fa-rotate-left"></i> Clear</button>
+          </div>
+        </form>
+
+        <div id="module-application-feedback" class="module-feedback" aria-live="polite"></div>
+        <div id="activity3-submissions-list" class="module-record-list"></div>
+      </div>
+
+      <div id="module-tracker" class="activity-module-panel">
+        <div class="module-panel-header">
+          <div>
+            <span class="section-tag">Activity 3 Module 2</span>
+            <h3>Opportunity Tracker and Search</h3>
+          </div>
+        </div>
+
+        <div class="activity-search-row">
+          <div class="form-group">
+            <label class="form-label" for="activity3-search">Search opportunity</label>
+            <input type="text" id="activity3-search" class="form-input" placeholder="Search by scholarship name...">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="activity3-type-filter">Filter by award type</label>
+            <select id="activity3-type-filter" class="form-input">
+              <option value="all">All</option>
+              <option value="Need-Based">Need-Based</option>
+              <option value="Merit-Based">Merit-Based</option>
+              <option value="Need & Merit Based">Need & Merit Based</option>
+              <option value="Research & Talent">Research & Talent</option>
+              <option value="Regional Need-Based">Regional Need-Based</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="activity3-tracker-list" class="module-record-list"></div>
+      </div>
+
       <!-- DYNAMIC RULE-BASED ELIGIBILITY ENGINE WIDGET -->
       <div class="eligibility-widget">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
